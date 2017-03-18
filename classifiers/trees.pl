@@ -1,6 +1,6 @@
 :-use_module(library(clpfd)).
 
-%data(P,pos),data(N,neg),features(FF),tree(FF,P,N,Tree), write(Tree).
+% data(P,pos),data(N,neg),features(FF),tree(FF,P,N,root,Tree),write(Tree).
 
 
 features(F):-
@@ -132,7 +132,7 @@ tree(F,P,N,Value,Value-node(BestV,Trees)):-
 
 tree_example_classification(Tree,Example,Classification).
 
-
+/*
 root-node(gills,
 	  [
 	      no-node(length,
@@ -144,3 +144,4 @@ root-node(gills,
 				  few-leaf(neg(1))]),
 		       5-leaf(pos(2))]),
 	      yes-leaf(neg(4))]).
+*/
