@@ -1,6 +1,6 @@
 :-use_module(library(clpfd)).
 
-%data(P,pos),data(N,neg),features(FF),tree(FF,P,N,Tree), write(Tree).
+% data(P,pos),data(N,neg),features(FF),tree(FF,P,N,root,Tree),write(Tree).
 
 
 features(F):-
@@ -127,6 +127,10 @@ tree(F,P,N,Value,Value-node(BestV,Trees)):-
 	select(BestV,F,F2),
 	%need a tree for each split
 	maplist(tree(F2),PosSplits2,NegSplits2,UValues,Trees).
+
+
+
+tree_example_classification(Tree,Example,Classification).
 
 
 root-node(gills,

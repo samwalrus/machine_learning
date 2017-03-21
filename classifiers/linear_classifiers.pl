@@ -166,23 +166,3 @@ linear_regression(Examples,Model).
 
 
 
-naive_bayes(Ps,Ns,Classifier).
-
-
-
-loop:-
-	read(X),
-	writeln(X),
-	check(X).
-
-
-check(X):-
-	X =s,
-	writeln('thanks for looping').
-
-check(X):-
-	dif(X,s),
-	loop.
-
-
-
