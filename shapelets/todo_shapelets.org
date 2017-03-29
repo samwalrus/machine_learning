@@ -1,0 +1,83 @@
+#+STARTUP: logdone
+
+
+* TODO Write a paper on shapelets for structured data.
+** TODO Write in the document but export to latex 
+* TODO Write some examples uses.
+Ideas:
+1. Time series of graphs.
+2. Time series of trees
+3. Time series of structured data (terms).
+Could be used in Reactome Pengine.
+People send queries and programs. These are terms.
+We also have the proof tree for the queries.
+
+* We would be classifiying users. 
+Perhaps by qualification or instiution or field.
+
+* We could also cluster users.
+
+* TODO Get the demo code working.
+** DONE Find info gain formular and check understanding
+   CLOSED: [2017-03-28 Tue 15:09]
+** TODO Import this distance predicates
+** TODO Work out what the best var needs to do
+** TODO make the s0_s1 relation loop throw a list of sequences.
+   
+* Introduction
+
+Shapelets were first proposed in *. They have been used in X, Y.
+Our work was inspired by the potenital uses in Pengine technology.
+In pengine technoloy users send programs and queries to be run on prolog servers.
+Therefore the providers of these services collect structured data.
+This structured data is a series of queries and programs.
+
+
+Providers of these services would like to be able to classify there users.
+For example willing to pay or not willing to pay
+It will also be useful to find clusters of users, in order to find commonalities of differnt types of users.
+
+* Machine learning structured data
+
+There are many algorithms for learning with structured data, for example ILP type  algorithms such as Progol, Tilde, and Foil.
+
+There is also propositionaltion techniques.
+
+There is also distance techniques.
+
+There is aslo kernel techniques.
+
+Shapelets work with data that is structued across time, but not any other relation.
+If each time point has structure, for example a graphs, programs and sets then.
+The 
+
+
+
+
+* Distancs and kernels for structured data
+
+Distance functions RIBL 
+Kfoil
+Nfoil
+Skolemnisation
+
+* Experments
+We use the train based dataset
+
+An instance is a sequence of trains.
+A positive instance is a sequence of trains blah
+
+We compare this method to using Aleph for run time and accuracy.
+We also compare to treeliker.
+And ribl.
+
+
+
+* Results
+Shaplet classifier are faster and more acurate !ha
+
+
+
+
+
+

@@ -255,9 +255,10 @@ acumulate_dis(Seq1,Seq2,Best,Dis,Ac):-
 	Ac1 <Best,
 	acumulate_dis(T1,T2,Best,Dis,Ac1).
 
-%two cases, should seq be an association list.
-% I think this is good but might be an idea to have some checks on
-% indexes as this has not been tested
+%two cases
+% I think this is good but might be an idea to have some checks on, it
+% works for going throw one sequence
+% this has not been tested fully
 s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
 	S0 = _S0Seq-S0Index,
 	S0Index = [FirstIndex|_RestIndex],
@@ -265,7 +266,7 @@ s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
 	LSeq #>= NewIndex +LS0-1,
 	length(S1Index,LS0),
 	EndIndex #=NewIndex +LS0-1,
-	numlist(NewIndex,EndIndex,S1Index), %I think there is a cflpd which is better
+	my_num_list(NewIndex,EndIndex,S1Index), %Could also use numlist but I think this is better
 	maplist(my_get_assoc(Seq),S1Index,S1Seq),
 	S1 =S1Seq-S1Index.
 s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
@@ -277,9 +278,31 @@ s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
 	#<(LSeq,EndIndex,true),
 	S1IndexBegin =1,
 	S1IndexEnd #= LS0+1,
-	numlist(S1IndexBegin,S1IndexEnd,S1Index),%as above
+	my_num_list(S1IndexBegin,S1IndexEnd,S1Index),%as above
 	maplist(my_get_assoc(Seq),S1Index,S1Seq),
 	S1 = S1Seq-S1Index.
+
+%Third case
+% move on to the next sequence in the list of sequences. I want the
+% three cases to be mutally exclusive
+s0_seq_s1_sizes_list0_list1(S0,Seq,S1,Sizes,List0,List1):-
+	%What is S0, it is the last subseq found by the other two.
+	%S1 is not a subseq of seq but a subseq of the next seq from list
+	List0 =[HeadSeq|List1],
+	length(H,SeqL),
+	H =[FirstValue|_RestValues],
+	my_num_list(1,SeqL,SeqIndex),
+	maplist(x_y_pair,SeqIndex,HeadSeq,Pairs),
+	list_to_assoc(Pairs,Assoc),
+	%What is seq, it is not related to both s0 and s1
+	fail.
+
+s0_s1_listofseqs(S0,S1,ListofSeqs):-
+	%S0 is  a tripple, subseq-index-seqfrom
+	%S1 is similar
+	%List of seqs is a list of assocs of the seqs and there indexes.
+	fail.
+
 
 my_get_assoc(Assoc,Key,Value):-
 	get_assoc(Key,Assoc,Value).
@@ -293,7 +316,17 @@ testseqs([First]-[1],Assoc,Seq,Subseq1):-
 	list_to_assoc(Pairs,Assoc),
 	s0_seq_s1_sizes([First]-[1],Assoc,Subseq1,SeqL-1).
 
-
+testseqs2([First]-[1],Assoc,Seq,Subseq1):-
+	List =[Seq1,Seq2,Seq3],
+	Seq1 =[a,b,c],
+	Seq2 =[x,y,z],
+	Seq3 =[q,r,t],
+	Seq1 =[First|_Rest],
+	length(Seq,SeqL),
+	numlist(1,SeqL,SeqIndex),
+	maplist(x_y_pair,SeqIndex,Seq1,Pairs),
+	list_to_assoc(Pairs,Assoc),
+	s0_seq_s1_sizes_list0_list1([First]-[1],Assoc,Subseq1,SeqL-1,List).
 
 
 %for a feature find its info gain and set to the best
@@ -635,3 +668,15 @@ data_feature_fvalue_d1_d2(Data,Feature,fvalue,D1,D2).
 data_tree(Data,Tree).
 
 tree_data_metrics(Data,Tree,Metrics).
+
+
+plus1(X,Y):-
+	Y #= X+1.
+
+
+my_num_list(Min,Max,List):-
+	Length #= Max - Min+1,
+	length(List,Length),
+	chain(List, #<),
+	List =[Min|_Rest],
+	last(List,Max).
