@@ -180,14 +180,6 @@ bf_seq_subseq(Seq,Subseq):-
 	seq_subseq(Seq,Subseq).
 
 
-%no seqs that start with 4.
-%
-prune([X|_]):-
-	dif(X,4).
-
-prune(Seq,Best).
-
-
 /*
  * eu
  *
@@ -266,7 +258,7 @@ s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
 	LSeq #>= NewIndex +LS0-1,
 	length(S1Index,LS0),
 	EndIndex #=NewIndex +LS0-1,
-	my_num_list(NewIndex,EndIndex,S1Index), %Could also use numlist but I think this is better
+	my_num_list(NewIndex,EndIndex,S1Index), %Could also use numlist but I think this is better, but numlist is fast
 	maplist(my_get_assoc(Seq),S1Index,S1Seq),
 	S1 =S1Seq-S1Index.
 s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
@@ -297,11 +289,132 @@ s0_seq_s1_sizes_list0_list1(S0,Seq,S1,Sizes,List0,List1):-
 	%What is seq, it is not related to both s0 and s1
 	fail.
 
-s0_s1_listofseqs(S0,S1,ListofSeqs):-
-	%S0 is  a tripple, subseq-index-seqfrom
+
+
+
+% refactor with assocs- think of what we need to do to control
+% backtracks.
+%case1, move up the indexes by 1, from is the same.
+s0_s1_seqs(S0-From,S1-From,AssocofSeqs):-
+	assoc_to_keys(S0,S0Keys),
+	maplist(plus(1),S0Keys,S1Keys),
+	get_assoc(From,AssocofSeqs,FromAssoc),
+	maplist(my_get_assoc(FromAssoc),S1Keys,S1Values), %this will fail if we go off the end
+	maplist(x_y_pair,S1Keys,S1Values,S1Pairs),
+	list_to_assoc(S1Pairs,S1),!.
+	%S0 is  a pair, indexedassoc - seqfrom
 	%S1 is similar
-	%List of seqs is a list of assocs of the seqs and there indexes.
-	fail.
+	%Assoc of seqs is an index assoc of assocs of the seqs and there indexes.
+	%can use max_assoc(Assoc,Max,V) to get the size of the index,(when from 1 probbaly fast (use min as well if not from one).
+%case2
+%increase length of s
+s0_s1_seqs(S0-From,S1-From,AssocofSeqs):-
+	max_assoc(S0,MaxKey,_V),
+	min_assoc(S0,MinKey,_V2),
+	NewSize #=MaxKey-MinKey+2,
+	NewMinKey #=1,
+	my_num_list(NewMinKey,NewSize,S1Keys),
+	get_assoc(From,AssocofSeqs,FromAssoc),
+	maplist(my_get_assoc(FromAssoc),S1Keys,S1Values),
+	maplist(x_y_pair,S1Keys,S1Values,S1Pair),
+	list_to_assoc(S1Pair,S1),!.
+
+%thirdcase
+s0_s1_seqs(_S0-From,S1-From2,AssocofSeqs):-
+	From2 #=From +1,
+	get_assoc(From2,AssocofSeqs,FromAssoc),
+	get_assoc(1,FromAssoc,Value),
+	list_to_assoc([1-Value],S1).
+
+
+
+newtest(Seqs):-
+	Seqs =[[a,b,c],[x,y,z]],
+	seqs_indexedassocs(Seqs,MainAssoc),
+	get_assoc(1,MainAssoc,FromAssoc),
+	get_assoc(1,FromAssoc,FirstValue),
+	list_to_assoc([1-FirstValue],S0),
+
+	format("S0 is ~w\n",[[1-FirstValue]]),
+
+	s0_s1_seqs(S0-1,S1-A,MainAssoc),
+	assoc_to_list(S1,S1L),
+	format("S1 is ~w\n",[S1L]),
+
+	s0_s1_seqs(S1-A,S2-B,MainAssoc),
+	assoc_to_list(S2,S2L),
+	format("S2 is ~w\n",[S2L]),
+
+	s0_s1_seqs(S2-B,S3-C,MainAssoc),
+	assoc_to_list(S3,S3L),
+	format("S3 is ~w\n",[S3L]),
+
+	s0_s1_seqs(S3-C,S4-D,MainAssoc),
+	assoc_to_list(S4,S4L),
+	format("S4 is ~w\n",[S4L]),
+
+	s0_s1_seqs(S4-D,S5-E,MainAssoc),
+	assoc_to_list(S5,S5L),
+	format("S5 is ~w\n",[S5L]),
+
+	s0_s1_seqs(S5-E,S6-F,MainAssoc),
+	assoc_to_list(S6,S6L),
+	format("S6 is ~w\n",[S6L]),
+
+	s0_s1_seqs(S6-F,S7-G,MainAssoc),
+	assoc_to_list(S7,S7L),
+	format("S7 is ~w\n",[S7L]),
+
+	s0_s1_seqs(S7-G,S8-H,MainAssoc),
+	assoc_to_list(S8,S8L),
+	format("S8 is ~w\n",[S8L]),
+
+	s0_s1_seqs(S8-H,S9-I,MainAssoc),
+	assoc_to_list(S9,S9L),
+	format("S9 is ~w\n",[S9L]),
+
+	s0_s1_seqs(S9-I,S10-J,MainAssoc),
+	assoc_to_list(S10,S10L),
+	format("S10 is ~w\n",[S10L]),
+
+	s0_s1_seqs(S10-J,S11-K,MainAssoc),
+	assoc_to_list(S11,S11L),
+	format("S11 is ~w\n",[S11L]),
+
+	s0_s1_seqs(S11-K,S12-L,MainAssoc),
+	assoc_to_list(S12,S12L),
+	format("S12 is ~w\n",[S12L]),
+
+	s0_s1_seqs(S12-L,S13-_M,MainAssoc), %will fail as no more.
+	assoc_to_list(S13,S13L),
+	format("S13 is ~w\n",[S13L]).
+
+
+
+
+
+
+
+
+
+
+
+
+% Seqs is a list of sequences, Assoc is an indexed assoc of indexed
+% assocs
+seqs_indexedassocs(Seqs,MainAssoc):-
+	maplist(seq_indexedassoc,Seqs,SeqAssocs),
+	length(SeqAssocs,Len),
+	my_num_list(1,Len,Index),
+	maplist(x_y_pair,Index,SeqAssocs,Pairs),
+	list_to_assoc(Pairs,MainAssoc).
+
+seq_indexedassoc(Seq,Assoc):-
+	length(Seq,L),
+	my_num_list(1,L,Index),
+	maplist(x_y_pair,Index,Seq,Pairs),
+	list_to_assoc(Pairs,Assoc).
+
 
 
 my_get_assoc(Assoc,Key,Value):-
@@ -311,7 +424,7 @@ testseqs([First]-[1],Assoc,Seq,Subseq1):-
 	Seq =[a,b,c,d],
 	Seq =[First|_Rest],
 	length(Seq,SeqL),
-	numlist(1,SeqL,SeqIndex),
+	my_num_list(1,SeqL,SeqIndex),
 	maplist(x_y_pair,SeqIndex,Seq,Pairs),
 	list_to_assoc(Pairs,Assoc),
 	s0_seq_s1_sizes([First]-[1],Assoc,Subseq1,SeqL-1).
@@ -323,7 +436,7 @@ testseqs2([First]-[1],Assoc,Seq,Subseq1):-
 	Seq3 =[q,r,t],
 	Seq1 =[First|_Rest],
 	length(Seq,SeqL),
-	numlist(1,SeqL,SeqIndex),
+	my_num_list(1,SeqL,SeqIndex),
 	maplist(x_y_pair,SeqIndex,Seq1,Pairs),
 	list_to_assoc(Pairs,Assoc),
 	s0_seq_s1_sizes_list0_list1([First]-[1],Assoc,Subseq1,SeqL-1,List).
