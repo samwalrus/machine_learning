@@ -247,6 +247,8 @@ acumulate_dis(Seq1,Seq2,Best,Dis,Ac):-
 	Ac1 <Best,
 	acumulate_dis(T1,T2,Best,Dis,Ac1).
 
+
+
 % refactor with assocs- think of what we need to do to control
 % backtracks.
 %case1, move up the indexes by 1, from is the same.
@@ -344,12 +346,44 @@ newtest(Seqs):-
 	assoc_to_list(S13,S13L),
 	format("S13 is ~w\n",[S13L]).
 
+newtest2(Seqs,N):-
+	seqs_indexedassocs(Seqs,MainAssoc),
+	get_assoc(1,MainAssoc,FromAssoc),
+	get_assoc(1,FromAssoc,FirstValue),
+	list_to_assoc([1-FirstValue],S0),
+	mytest2h(S0-1,_SEnd,FromAssoc,N).
+
+
+mytest2h(SBegin,SEnd,Assocs,Count):-
+	Count #>=0,
+	assoc_to_list(SBegin,SBeginL),
+	format("Seq is ~w",[SBeginL]),
+	s0_s1_seqs(SBegin,SMiddle,Assocs),
+	Count2 #=Count-1,
+	mytest2h(SMiddle,SEnd,Assocs,Count2).
+
+mytest2h(SBegin,SEnd,Assocs,_Count):-
+	s0_s1_seqs(SBegin,SEnd,Assocs).
 
 
 
 my_get_assoc(Assoc,Key,Value):-
 	get_assoc(Key,Assoc,Value).
 
+% Seqs is a list of sequences, Assoc is an indexed assoc of indexed
+% assocs
+seqs_indexedassocs(Seqs,MainAssoc):-
+       maplist(seq_indexedassoc,Seqs,SeqAssocs),
+       length(SeqAssocs,Len),
+       my_num_list(1,Len,Index),
+       maplist(x_y_pair,Index,SeqAssocs,Pairs),
+       list_to_assoc(Pairs,MainAssoc).
+
+seq_indexedassoc(Seq,Assoc):-
+       length(Seq,L),
+       my_num_list(1,L,Index),
+       maplist(x_y_pair,Index,Seq,Pairs),
+       list_to_assoc(Pairs,Assoc).
 
 
 %for a feature find its info gain and set to the best
