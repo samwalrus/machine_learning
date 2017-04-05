@@ -247,51 +247,6 @@ acumulate_dis(Seq1,Seq2,Best,Dis,Ac):-
 	Ac1 <Best,
 	acumulate_dis(T1,T2,Best,Dis,Ac1).
 
-%two cases
-% I think this is good but might be an idea to have some checks on, it
-% works for going throw one sequence
-% this has not been tested fully
-s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
-	S0 = _S0Seq-S0Index,
-	S0Index = [FirstIndex|_RestIndex],
-	NewIndex #= FirstIndex +1,
-	LSeq #>= NewIndex +LS0-1,
-	length(S1Index,LS0),
-	EndIndex #=NewIndex +LS0-1,
-	my_num_list(NewIndex,EndIndex,S1Index), %Could also use numlist but I think this is better, but numlist is fast
-	maplist(my_get_assoc(Seq),S1Index,S1Seq),
-	S1 =S1Seq-S1Index.
-s0_seq_s1_sizes(S0,Seq,S1,LSeq-LS0):-
-       %this case for when we need to restart with larger subseq.
-	S0 = _S0Seq-S0Index,
-	S0Index = [FirstIndex|_RestIndex],
-	NewIndex #= FirstIndex +1,
-	EndIndex #= NewIndex + LS0-1,
-	#<(LSeq,EndIndex,true),
-	S1IndexBegin =1,
-	S1IndexEnd #= LS0+1,
-	my_num_list(S1IndexBegin,S1IndexEnd,S1Index),%as above
-	maplist(my_get_assoc(Seq),S1Index,S1Seq),
-	S1 = S1Seq-S1Index.
-
-%Third case
-% move on to the next sequence in the list of sequences. I want the
-% three cases to be mutally exclusive
-s0_seq_s1_sizes_list0_list1(S0,Seq,S1,Sizes,List0,List1):-
-	%What is S0, it is the last subseq found by the other two.
-	%S1 is not a subseq of seq but a subseq of the next seq from list
-	List0 =[HeadSeq|List1],
-	length(H,SeqL),
-	H =[FirstValue|_RestValues],
-	my_num_list(1,SeqL,SeqIndex),
-	maplist(x_y_pair,SeqIndex,HeadSeq,Pairs),
-	list_to_assoc(Pairs,Assoc),
-	%What is seq, it is not related to both s0 and s1
-	fail.
-
-
-
-
 % refactor with assocs- think of what we need to do to control
 % backtracks.
 %case1, move up the indexes by 1, from is the same.
@@ -392,54 +347,9 @@ newtest(Seqs):-
 
 
 
-
-
-
-
-
-
-
-
-% Seqs is a list of sequences, Assoc is an indexed assoc of indexed
-% assocs
-seqs_indexedassocs(Seqs,MainAssoc):-
-	maplist(seq_indexedassoc,Seqs,SeqAssocs),
-	length(SeqAssocs,Len),
-	my_num_list(1,Len,Index),
-	maplist(x_y_pair,Index,SeqAssocs,Pairs),
-	list_to_assoc(Pairs,MainAssoc).
-
-seq_indexedassoc(Seq,Assoc):-
-	length(Seq,L),
-	my_num_list(1,L,Index),
-	maplist(x_y_pair,Index,Seq,Pairs),
-	list_to_assoc(Pairs,Assoc).
-
-
-
 my_get_assoc(Assoc,Key,Value):-
 	get_assoc(Key,Assoc,Value).
 
-testseqs([First]-[1],Assoc,Seq,Subseq1):-
-	Seq =[a,b,c,d],
-	Seq =[First|_Rest],
-	length(Seq,SeqL),
-	my_num_list(1,SeqL,SeqIndex),
-	maplist(x_y_pair,SeqIndex,Seq,Pairs),
-	list_to_assoc(Pairs,Assoc),
-	s0_seq_s1_sizes([First]-[1],Assoc,Subseq1,SeqL-1).
-
-testseqs2([First]-[1],Assoc,Seq,Subseq1):-
-	List =[Seq1,Seq2,Seq3],
-	Seq1 =[a,b,c],
-	Seq2 =[x,y,z],
-	Seq3 =[q,r,t],
-	Seq1 =[First|_Rest],
-	length(Seq,SeqL),
-	my_num_list(1,SeqL,SeqIndex),
-	maplist(x_y_pair,SeqIndex,Seq1,Pairs),
-	list_to_assoc(Pairs,Assoc),
-	s0_seq_s1_sizes_list0_list1([First]-[1],Assoc,Subseq1,SeqL-1,List).
 
 
 %for a feature find its info gain and set to the best
