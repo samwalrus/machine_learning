@@ -250,7 +250,7 @@ acumulate_dis(Seq1,Seq2,Best,Dis,Ac):-
 
 
 % refactor with assocs- think of what we need to do to control
-% backtracks.
+% backtracks. %
 %case1, move up the indexes by 1, from is the same.
 s0_s1_seqs(S0-From,S1-From,AssocofSeqs):-
 	assoc_to_keys(S0,S0Keys),
@@ -346,25 +346,30 @@ newtest(Seqs):-
 	assoc_to_list(S13,S13L),
 	format("S13 is ~w\n",[S13L]).
 
+%Seqs is a list of a list of seqs, N is how many you want.
 newtest2(Seqs,N):-
 	seqs_indexedassocs(Seqs,MainAssoc),
 	get_assoc(1,MainAssoc,FromAssoc),
 	get_assoc(1,FromAssoc,FirstValue),
 	list_to_assoc([1-FirstValue],S0),
-	mytest2h(S0-1,_SEnd,FromAssoc,N).
+	mytest2h(S0-1,_SEnd-_ThingEnd,MainAssoc,N).
 
 
-mytest2h(SBegin,SEnd,Assocs,Count):-
-	Count #>=0,
+mytest2h(SBegin-Thing,SEnd-ThingEnd,Assocs,Count):-
+	Count #>=1,
 	assoc_to_list(SBegin,SBeginL),
-	format("Seq is ~w",[SBeginL]),
-	s0_s1_seqs(SBegin,SMiddle,Assocs),
+	format("Seq is ~w\n",[SBeginL]),
+	s0_s1_seqs(SBegin-Thing,SMiddle-Thing2,Assocs),
 	Count2 #=Count-1,
-	mytest2h(SMiddle,SEnd,Assocs,Count2).
+	mytest2h(SMiddle-Thing2,SEnd-ThingEnd,Assocs,Count2).
 
-mytest2h(SBegin,SEnd,Assocs,_Count):-
-	s0_s1_seqs(SBegin,SEnd,Assocs).
+mytest2h(SBegin-Thing,SEnd-Thing2,Assocs,Count):-
+	Count #< 1,
+	writeln('end'),
+	s0_s1_seqs(SBegin-Thing,SEnd-Thing2,Assocs).
 
+seqs_for_test(Seqs):-
+	Seqs =[[a,b,c],[x,y,z]].
 
 
 my_get_assoc(Assoc,Key,Value):-
