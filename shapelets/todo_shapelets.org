@@ -22,8 +22,11 @@ Perhaps by qualification or instiution or field.
    CLOSED: [2017-03-28 Tue 15:09]
 ** TODO Import this distance predicates
 ** TODO Work out what the best var needs to do
-** TODO make the s0_s1 relation loop throw a list of sequences.
-   
+** DONE make the s0_s1 relation loop throw a list of sequences.
+   CLOSED: [2017-04-05 Wed 12:05]
+** TODO make s0_1 relation test work for n length
+** TODO Add min and max to s0_s1 relation.
+** TODO Work out how to thread the program into this relation
 * Introduction
 
 Shapelets were first proposed in *. They have been used in X, Y.
