@@ -24,8 +24,10 @@ Perhaps by qualification or instiution or field.
 ** TODO Work out what the best var needs to do
 ** DONE make the s0_s1 relation loop throw a list of sequences.
    CLOSED: [2017-04-05 Wed 12:05]
-** TODO make s0_1 relation test work for n length
-** TODO Add min and max to s0_s1 relation.
+** DONE make s0_1 relation test work for n length
+   CLOSED: [2017-04-10 Mon 11:21]
+** DONE Add min and max to s0_s1 relation.
+   CLOSED: [2017-04-10 Mon 11:53]
 ** TODO Work out how to thread the program into this relation
 * Introduction
 

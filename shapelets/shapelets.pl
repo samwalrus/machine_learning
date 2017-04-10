@@ -371,6 +371,10 @@ mytest2h(SBegin-Thing,SEnd-Thing2,Assocs,Count):-
 seqs_for_test(Seqs):-
 	Seqs =[[a,b,c],[x,y,z]].
 
+seqs_for_test2(Seqs):-
+	Seqs =[[a,b,c,d,e,f],[q,w,e,r,t,y,z]].
+
+
 
 my_get_assoc(Assoc,Key,Value):-
 	get_assoc(Key,Assoc,Value).
@@ -389,6 +393,71 @@ seq_indexedassoc(Seq,Assoc):-
        my_num_list(1,L,Index),
        maplist(x_y_pair,Index,Seq,Pairs),
        list_to_assoc(Pairs,Assoc).
+
+
+%needs to be tested.
+%Version with paramters, i.e min max to start with.
+%case1, move up the indexes by 1, from is the same.
+s0_s1_seqs_p(S0-From,S1-From,AssocofSeqs,_P):-
+	assoc_to_keys(S0,S0Keys),
+	maplist(plus(1),S0Keys,S1Keys),
+	get_assoc(From,AssocofSeqs,FromAssoc),
+	maplist(my_get_assoc(FromAssoc),S1Keys,S1Values), %this will fail if we go off the end
+	maplist(x_y_pair,S1Keys,S1Values,S1Pairs),
+	list_to_assoc(S1Pairs,S1),!.
+	%S0 is  a pair, indexedassoc - seqfrom
+	%S1 is similar
+	%Assoc of seqs is an index assoc of assocs of the seqs and there indexes.
+%can use max_assoc(Assoc,Max,V) to get the size of the index,(when from 1 probbaly fast (use min as well if not from one).
+%case2
+%increase length of s now up to a max size.
+s0_s1_seqs_p(S0-From,S1-From,AssocofSeqs,P):-
+	P = _Min-Max,
+	max_assoc(S0,MaxKey,_V),
+	min_assoc(S0,MinKey,_V2),
+	NewSize #=MaxKey-MinKey+2,
+	Max #>= NewSize,
+	NewMinKey #=1,
+	my_num_list(NewMinKey,NewSize,S1Keys),
+	get_assoc(From,AssocofSeqs,FromAssoc),
+	maplist(my_get_assoc(FromAssoc),S1Keys,S1Values),
+	maplist(x_y_pair,S1Keys,S1Values,S1Pair),
+	list_to_assoc(S1Pair,S1),!.
+
+%thirdcase
+%This is for starting on the next seq so min is important here
+s0_s1_seqs_p(_S0-From,S1-From2,AssocofSeqs,P):-
+	P= Min-_Max,
+	From2 #=From +1,
+	get_assoc(From2,AssocofSeqs,FromAssoc),
+	my_num_list(1,Min,Indicies),
+	maplist(my_get_assoc(FromAssoc),Indicies,Values),
+	maplist(x_y_pair,Indicies,Values,Pairs),
+	list_to_assoc(Pairs,S1).
+
+%Seqs is a list of a list of seqs, N is how many you want. The Min-Max
+newtest3(Seqs,N,Min-Max):-
+	seqs_indexedassocs(Seqs,MainAssoc),
+	get_assoc(1,MainAssoc,FromAssoc),
+	my_num_list(1,Min,Indicies),
+	maplist(my_get_assoc(FromAssoc),Indicies,Values),
+	maplist(x_y_pair,Indicies,Values,Pairs),
+	list_to_assoc(Pairs,S0),
+	mytest3h(S0-1,_SEnd-_ThingEnd,MainAssoc,N,Min-Max).
+
+
+mytest3h(SBegin-Thing,SEnd-ThingEnd,Assocs,Count,Min-Max):-
+	Count #>=1,
+	assoc_to_list(SBegin,SBeginL),
+	format("Seq is ~w\n",[SBeginL]),
+	s0_s1_seqs_p(SBegin-Thing,SMiddle-Thing2,Assocs,Min-Max),
+	Count2 #=Count-1,
+	mytest3h(SMiddle-Thing2,SEnd-ThingEnd,Assocs,Count2,Min-Max).
+
+mytest3h(SBegin-Thing,SEnd-Thing2,Assocs,Count,Min-Max):-
+	Count #< 1,
+	writeln('end'),
+	s0_s1_seqs_p(SBegin-Thing,SEnd-Thing2,Assocs,Min-Max).
 
 
 %for a feature find its info gain and set to the best
