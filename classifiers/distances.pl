@@ -185,3 +185,7 @@ test(Test):-
                          owl(hermes),
                          owl(errol),
                          pygmy_puff(arnold)])]).
+
+/** <examples>
+ ?-data(X),test(T),data_instance_k_classification(X,T,3,C).
+ */
