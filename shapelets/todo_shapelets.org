@@ -22,7 +22,7 @@ Perhaps by qualification or instiution or field.
    CLOSED: [2017-03-28 Tue 15:09]
 ** TODO Import this distance predicates
 ** TODO Work out what the best var needs to do
-** DONE make the s0_s1 relation loop throw a list of sequences.
+** DONE make the s0_s1 relation loop through a list of sequences.
    CLOSED: [2017-04-05 Wed 12:05]
 ** DONE make s0_1 relation test work for n length
    CLOSED: [2017-04-10 Mon 11:21]
@@ -50,11 +50,11 @@ There is also propositionaltion techniques.
 
 There is also distance techniques.
 
-There is aslo kernel techniques.
+There is also kernel techniques.
 
 Shapelets work with data that is structued across time, but not any other relation.
 If each time point has structure, for example a graphs, programs and sets then.
-The 
+The
 
 
 
@@ -80,6 +80,10 @@ And ribl.
 
 * Results
 Shaplet classifier are faster and more acurate !ha
+
+ 
+
+
 
 
 
