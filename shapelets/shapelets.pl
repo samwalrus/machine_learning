@@ -12,10 +12,14 @@
  *
  */
 
+
+
+
+
 :- dynamic best/2.
 /*
  *  log2(+Number, -Number)
- *
+ *This is a frog.
 Returns the log2 value of a number, The shapelets paper uses loge but
 most other sources would use log 2
 */
@@ -435,7 +439,9 @@ s0_s1_seqs_p(_S0-From,S1-From2,AssocofSeqs,P):-
 	maplist(x_y_pair,Indicies,Values,Pairs),
 	list_to_assoc(Pairs,S1).
 
-%Seqs is a list of a list of seqs, N is how many you want. The Min-Max
+%Seqs is a list of a list of seqs, N is how many you want. Then Min-Max
+%?- seqs_for_test2(Seqs), newtest3(Seqs,15,2-4).
+
 newtest3(Seqs,N,Min-Max):-
 	seqs_indexedassocs(Seqs,MainAssoc),
 	get_assoc(1,MainAssoc,FromAssoc),
@@ -510,24 +516,35 @@ data_pair(i(Id,X,Y),Y-(X-Id)).
 % Shapelet feature is the subsequence the relation and splitting value
 % that best classifies data, Min-Max is the min and maxium length of
 % a shapelet
-data_max_shapeletfeature(D,Min-Max,Shapletfeature):-
+% p is for parameter ie min-max
+data_p_shapeletfeature(DataList,Min-Max,ShapeletFeature):-
 	%From data generate a first potenital shaplet
 	%First subseq from data
-	data_min_firstsubseq(D,Min,P),
-	length(P,LP),
-        Max #> LP,
-	%best has to be the firstsubseq,_F is blank (later F will be a term like : >=Value) and entropy is a high number at this stage.
-	data_max_best_potshape_shapeletfeature(D,Max,best(P,_F,100),P,ShapeletFeature).
+	data_min_firstshapelet(DataList-DataAssoc,Min,PotShapeletSeq),
+	%length(PotShapeletSeq,LP),%This is an assoc not a list, length will be min anyway.
+        %Max #> LP,
+	%calculate the distance from this shapelet to all sequences in data or is this done in the next predicate?
+	%Make the feature ie operator and threshold that best splits the data
+	%set this shapelet, the operator and threshold in best.
+	data_p_best_potshape_shapeletfeature(DataList-DataAssoc,Min-Max,best(empty,_Threshold-_Op,1000),PotShapeletSeq,ShapeletFeature).
+
+data_min_firstshapelet(D-MainAssoc,Min,S0-1):-
+	seqs_indexedassocs(D,MainAssoc),
+	get_assoc(1,MainAssoc,FromAssoc),
+	my_num_list(1,Min,Indicies),
+	maplist(my_get_assoc(FromAssoc),Indicies,Values),
+	maplist(x_y_pair,Indicies,Values,Pairs),
+	list_to_assoc(Pairs,S0).
 
 % go through all the potential shaplets searching for the one that gives
 % best infogain. Can best and pot be the same thing.
-data_max_best_potshape_shapeletfeature(D,Max,Best,P,S):-
-	data_best_sofar_shaplet_entropy(D,Best,[],P,Entropy),
-	subseq0_subseq1(P,P2),
-	data_max_best_potshapelet_shapeletfeature(D,Max,Best2,P,S).
+data_p_best_potshapelet_shapeletfeature(DList-DAssoc,Min-Max,Best,P,S):-
+	data_best_sofar_potshapelet_entropy(DList,Best,[],P,Entropy),
+	s0_s1_seqs_p(P,P2,DAssoc,Min-Max),
+	data_p_best_potshapelet_shapeletfeature(DList-DAssoc,Min-Max,Best2,P2,S).
 % If you can not gen a new subsequence then we have reached then end
 % return best.
-data_max_best_potshape_shapeletfeature(D,_,Best,_,Best).
+data_p_best_potshape_shapeletfeature(_DL-_DA,_Min-_Max,Best,_PotShape,Best).
 
 
 /*
@@ -546,7 +563,7 @@ data_max_best_potshape_shapeletfeature(D,_,Best,_,Best).
 %Best should be a tripple, best(Shapelet,Feature,Entropy).
 %If pos or neg count reach zero then stop
 %The first time we take two, then we take one.
-data_best_sofar_shapelet_entropy(Data,Best,Sofar,Shapelet,Entropy):-
+data_best_sofar_potshapelet_entropy(Data,Best,Sofar,Shapelet,Entropy):-
 	Sofar =[],
 	Data =[i(I_id1,I1_class),i(I_id2,I2_class)|Rest],
 	%get distances of 2 instances from Shapelet
@@ -573,25 +590,7 @@ data_best_sofar_shapelet_entropy(Data,Best,Sofar,Shapelet,Entropy):-
         %if this is better continue calculating entropy to find out its true value.
 	%If the poscount or neg count is zero then optimistic entropy the correct entropy and you return this entropy and feature for that shapelet
         data_counts_best_sofar_feature_entropy_h(Rest,Counts,Best1,SoFar2,Shapelet,Entropy).
-
-
-%Steadfast improvement? Constraints to improve back tracking
-data_counts_best_sofar_feature_entropy_h(Data,0-Other,Best1,_,Best1,Entropy):-
-	%pos count is 0
-	dif(Data,[]),
-	dif(Other,0),
-	simple_entropy.
-data_counts_best_sofar_feature_entropy_h(Data,Other-0,Best1,_,Best1,Entropy):-
-	%neg count is 0
-	dif(Data,[]),
-	dif(Other,0),
-	simple_entropy.
-data_counts_best_sofar_shapelet_entropy_h([],O1-O2,_Best,Sofar,_Shapelet,Entropy):-
-	%probably redudant but if whole list is zero
-	dif(O1,0),
-	dif(O2,0),
-	simple_entropy(Sofar,[],_Shapelet,Entropy).
-data_counts_best_sofar_shapelet_entropy_r(Data,Counts0,Best,Sofar,Shapelet,Entropy):-
+data_counts_best_sofar_shapelet_entropy(Data,Counts0,Best,Sofar,Shapelet,Entropy):-
 	dif(Data,[]),
 	Counts0 = CountPos0-CountNeg0,
 	maplist(#>,[CountPos0,CountNeg0],[0,0]),
@@ -614,7 +613,25 @@ data_counts_best_sofar_shapelet_entropy_r(Data,Counts0,Best,Sofar,Shapelet,Entro
 	min_list(Entropies,Infogain1),
 	Infogain1 < Best, %if it is less then carry on???
 	%Best needs to have the feature as well as its entropy.
-	data_counts_best_sofar_feature_infogain_r(Rest,Counts1,Best,SoFar2,Shapelet,Entropy).%rest might need the second removed element as the head
+	data_counts_best_sofar_feature_entropy(Rest,Counts1,Best,SoFar2,Shapelet,Entropy).%rest might need the second removed element as the head
+
+%Steadfast improvement? Constraints to improve back tracking
+data_counts_best_sofar_feature_entropy_h(Data,0-Other,Best1,_,Best1,Entropy):-
+	%pos count is 0
+	dif(Data,[]),
+	dif(Other,0),
+	simple_entropy.
+data_counts_best_sofar_feature_entropy_h(Data,Other-0,Best1,_,Best1,Entropy):-
+	%neg count is 0
+	dif(Data,[]),
+	dif(Other,0),
+	simple_entropy.
+data_counts_best_sofar_shapelet_entropy_h([],O1-O2,_Best,Sofar,_Shapelet,Entropy):-
+	%probably redudant but if whole list is zero
+	dif(O1,0),
+	dif(O2,0),
+	simple_entropy(Sofar,[],_Shapelet,Entropy).
+
 
 
 instanceclass_counts0_counts1(Class,Counts0,Counts1):-
