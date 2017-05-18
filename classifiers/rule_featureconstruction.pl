@@ -88,18 +88,24 @@ run(Fs,FeatureValuesPairs,FeatureNames,Rows,New):-
 %%%%%%%%%For attributes that have real number values%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test(Features):-
-	data2([Headers|Data]),
+test(Features2):-
+	data2(Data),
+        %data2([Headers|Data]),
 	fronts_lasts_lists(DataNoClass,Classes,Data),
 	multimember(As,DataNoClass),%choice point here
-	maplist(make_int,As,As2),
+        As = [Head|As1],
+	maplist(make_int,As1,As2),
 	writeln(As2),
-        length(DataNoClass,L),
+        length(As1,L),
 	numlist(1,L,Numlist),
-	maplist(idnumber_class_attributevalue_struct,Numlist,Classes,As2,Is),
+	Classes =[_|Classes2],
+	maplist(idnumber_class_attributevalue_struct,Numlist,Classes2,As2,Is),
 	gen_feature(Is,Features),
 	maplist(features_values_truths(Features),As2,Truths),
+        maplist(head_pair_feature(Head),Features,Features2),
 	writeln(Truths).
+
+head_pair_feature(Z,X-Y,f(Z,X,Y)).
 
 collumn_class(As-Classes):-
 	data2([Headers|Data]),
