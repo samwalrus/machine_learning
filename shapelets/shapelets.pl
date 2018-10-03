@@ -1,4 +1,5 @@
 :-use_module(library(clpfd)).
+:-use_module(reif).
 
 /*
  * A shapelet is a subseq from the the set of instances. (In theory it
@@ -32,7 +33,7 @@ loge(X,LogE):-
 
 
 /*
- * Reified truth tests
+ * Reified truth tests.
  *
  */
 #=<(X,Y,Truth) :- X=<Y,Truth=true.
@@ -50,45 +51,6 @@ loge(X,LogE):-
 #>=(X,Y,Truth) :- X>=Y,Truth=true.
 #>=(X,Y,Truth) :- X<Y,Truth=false.
 
-=(X, Y, T) :-
-   (  X == Y -> T = true
-   ;  X \= Y -> T = false
-   ;  T = true, X = Y
-   ;  T = false,
-      dif(X, Y)                             % ISO extension
-      % throw(error(instantiation_error,_)) % ISO strict
-   ).
-/*
- *
- * Logical if then else
- *
- */
-if_(C_1,Then_0,Else_0) -->
-    { call(C_1,Truth) },
-    { functor(Truth,_,0) },  % safety check
-    (  { Truth == true }  -> phrase(Then_0)
-    ;  { Truth == false },   phrase(Else_0)
-    ).
-
-if_(If_1, Then_0, Else_0) :-
-   call(If_1, T),
-   (  T == true -> call(Then_0)
-   ;  T == false -> call(Else_0)
-   ;  nonvar(T) -> throw(error(type_error(boolean,T),_))
-   ;  /* var(T) */ throw(error(instantiation_error,_))
-   ).
-
-/*
- * Split list on predicate_p_2 truth values
- *
- */
-tpartition(P_2,List,Ts,Fs) :- tpartition_ts_fs_(List,Ts,Fs,P_2).
-
-tpartition_ts_fs_([],[],[],_).
-tpartition_ts_fs_([i(IdX,ClassX,X)|Xs0],Ts,Fs,P_2) :-
-   if_(call(P_2,X), (Ts = [i(IdX,ClassX,X)|Ts0], Fs = Fs0),
-                    (Ts = Ts0,     Fs = [i(IdX,ClassX,X)|Fs0])),
-   tpartition_ts_fs_(Xs0,Ts0,Fs0,P_2).
 
 /*
  * truth count
@@ -185,7 +147,7 @@ bf_seq_subseq(Seq,Subseq):-
 
 
 /*
- * eu
+ * euclidian distance
  *
  *
  */
@@ -828,3 +790,17 @@ my_num_list(Min,Max,List):-
 	chain(List, #<),
 	List =[Min|_Rest],
 	last(List,Max).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
